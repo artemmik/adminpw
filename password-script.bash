@@ -19,7 +19,7 @@ change_admin_password() {
     if id "$username" &>/dev/null; then
         printf "Changing password for user: %s\n" "$username"
         # Using dscl to change the password, requires old password
-        if dscl . -u "/Users/$username" -P "$old_password" -passwd "/Users/$username" "$new_password"; then
+        if dscl -u "/Users/$username" -P "$old_password" . -passwd "/Users/$username" "$new_password"; then
             printf "Password for user %s changed successfully.\n" "$username"
         else
             printf "Failed to change password for user %s. Please check your old password or user permissions.\n" "$username" >&2
