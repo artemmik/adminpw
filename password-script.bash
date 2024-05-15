@@ -12,31 +12,35 @@ check_root() {
 
 # Function to change the password for the admin user
 change_admin_password() {
-    local username="diceadmin"  # Username set to 'diceadmin'
-    local new_password="$1"
+    local username="$1"  # Username is now a parameter to the function
+    local old_password="$2"
+    local new_password="$3"
 
     if id "$username" &>/dev/null; then
-        printf "Changing password for admin user: %s\n" "$username"
-        if dscl . -passwd /Users/"$username" "$new_password"; then
-            printf "Password for admin user %s changed successfully.\n" "$username"
+        printf "Changing password for user: %s\n" "$username"
+        # Using dscl to change the password, requires old password
+        if dscl . -u "/Users/$username" -P "$old_password" -passwd "/Users/$username" "$new_password"; then
+            printf "Password for user %s changed successfully.\n" "$username"
         else
-            printf "Failed to change password for admin user %s.\n" "$username" >&2
+            printf "Failed to change password for user %s. Please check your old password or user permissions.\n" "$username" >&2
             return 1
         fi
     else
-        printf "Admin user %s does not exist\n" "$username" >&2
+        printf "User %s does not exist\n" "$username" >&2
         return 1
     fi
 }
 
 main() {
-    local new_password="new_secure_password123"  # Change this to the desired new password
+    local username="diceadmin"  # Specify the username whose password needs to be changed
+    local old_password="oldpassword"  # Specify the current password
+    local new_password="new_secure_password123"  # Specify the new password
 
     if ! check_root; then
         return 1
     fi
 
-    change_admin_password "$new_password"
+    change_admin_password "$username" "$old_password" "$new_password"
 }
 
 main
